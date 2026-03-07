@@ -73,8 +73,8 @@ def confusion(classifier, X_tr, y_tr, X_te, y_te):
     sklearn_acc_te = accuracy_score(y_te, classifier.predict(X_te))
 
     print(f'Sklearn Results:')
-    print(f'--- Accuracy (train): {sklearn_acc_tr}')
-    print(f'--- Accuracy (test): {sklearn_acc_te}')
+    print(f'--- Accuracy (train): {100*sklearn_acc_tr:.2f}%')
+    print(f'--- Accuracy (test): {100*sklearn_acc_te:.2f}%')
 
     sklearn_cm = confusion_matrix(y_te, classifier.predict(X_te))
     sklearn_disp = ConfusionMatrixDisplay(confusion_matrix = sklearn_cm)
