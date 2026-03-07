@@ -76,7 +76,6 @@ def confusion(classifier, X_tr, y_tr, X_te, y_te):
     print(f'--- Accuracy (train): {sklearn_acc_tr}')
     print(f'--- Accuracy (test): {sklearn_acc_te}')
 
-    # Evaluate confusion matrix using the sklearn function confusion_matrix
     sklearn_cm = confusion_matrix(y_te, classifier.predict(X_te))
     sklearn_disp = ConfusionMatrixDisplay(confusion_matrix = sklearn_cm)
     sklearn_disp.plot();
