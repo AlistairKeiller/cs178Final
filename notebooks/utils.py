@@ -66,16 +66,28 @@ def get_binary_data(seed):
         wine_y_test,
     )
 
-def confusion(classifier, X_tr, y_tr, X_te, y_te):
+def confusion(classifier, X_tr, y_tr, X_val, y_val):
+    classifier.fit(X_tr, y_tr)
+
+    acc_tr = accuracy_score(y_tr, classifier.predict(X_tr))
+    acc_te = accuracy_score(y_val, classifier.predict(X_val))
+
+    print(f'Results:')
+    print(f'--- Accuracy (train): {100*acc_tr:.2f}%')
+    print(f'--- Accuracy (test): {100*acc_te:.2f}%')
+
+    cm = confusion_matrix(y_val, classifier.predict(X_val))
+    disp = ConfusionMatrixDisplay(confusion_matrix = cm)
+    disp.plot();
+
+def print_final_results(classifier, X_tr, y_tr, X_val, y_val, X_te, y_te):
     classifier.fit(X_tr, y_tr)
 
     sklearn_acc_tr = accuracy_score(y_tr, classifier.predict(X_tr))
+    sklearn_acc_val = accuracy_score(y_val, classifier.predict(X_val))
     sklearn_acc_te = accuracy_score(y_te, classifier.predict(X_te))
 
-    print(f'Sklearn Results:')
+    print(f'Results:')
     print(f'--- Accuracy (train): {100*sklearn_acc_tr:.2f}%')
-    print(f'--- Accuracy (test): {100*sklearn_acc_te:.2f}%')
-
-    sklearn_cm = confusion_matrix(y_te, classifier.predict(X_te))
-    sklearn_disp = ConfusionMatrixDisplay(confusion_matrix = sklearn_cm)
-    sklearn_disp.plot();
+    print(f'--- Accuracy (validation): {100*sklearn_acc_val:.2f}%')
+    print(f'--- Accuracy (test): {100*sklearn_acc_te:.2f}%') #this is the final accuracy
