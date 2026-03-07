@@ -1,6 +1,7 @@
 from ucimlrepo import fetch_ucirepo
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
 
 
 def get_data(seed):
@@ -64,3 +65,18 @@ def get_binary_data(seed):
         wine_y_val,
         wine_y_test,
     )
+
+def confusion(classifier, X_tr, y_tr, X_te, y_te):
+    classifier.fit(X_tr, y_tr)
+
+    sklearn_acc_tr = accuracy_score(y_tr, classifier.predict(X_tr))
+    sklearn_acc_te = accuracy_score(y_te, classifier.predict(X_te))
+
+    print(f'Sklearn Results:')
+    print(f'--- Accuracy (train): {sklearn_acc_tr}')
+    print(f'--- Accuracy (test): {sklearn_acc_te}')
+
+    # Evaluate confusion matrix using the sklearn function confusion_matrix
+    sklearn_cm = confusion_matrix(y_te, classifier.predict(X_te))
+    sklearn_disp = ConfusionMatrixDisplay(confusion_matrix = sklearn_cm)
+    sklearn_disp.plot();
