@@ -4,6 +4,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
 import pandas as pd
 import numpy as np
+import plotly.express as px
+import plotly.io as pio
 
 
 def get_data(seed):
@@ -68,6 +70,7 @@ def get_binary_data(seed):
         wine_y_test,
     )
 
+
 def get_binned_stratified_data(seed):
     np.random.seed(seed=seed)
     wine_quality = fetch_ucirepo(name="Wine Quality")
@@ -83,27 +86,27 @@ def get_binned_stratified_data(seed):
     wine_y = wine_quality_data["quality"]
     wine_y -= wine_y.min()
 
-    #sorry this isn't general lol, binning the data
+    # sorry this isn't general lol, binning the data
     bins_y = [
-        wine_y[wine_y <= 1], #classes 3-4
-        wine_y[(wine_y >= 2) & (wine_y <=3)], #classes 5-6
-        wine_y[wine_y >= 4], #classes 7-9
+        wine_y[wine_y <= 1],  # classes 3-4
+        wine_y[(wine_y >= 2) & (wine_y <= 3)],  # classes 5-6
+        wine_y[wine_y >= 4],  # classes 7-9
     ]
     bins_X = [wine_X[b.index] for b in bins_y]
 
-    #sampling the data, this is general!
+    # sampling the data, this is general!
     size = min(len(y) for y in bins_y)
     sampled_X = []
     sampled_y = []
     for i, (bX, by) in enumerate(zip(bins_X, bins_y)):
-        #randomly sampling by size (minimum length) per bin
+        # randomly sampling by size (minimum length) per bin
         index = np.random.choice(len(by), size=size, replace=False)
-        #picking X value at these random indices
+        # picking X value at these random indices
         sampled_X.append(bX[index])
-        #they're all in the same 0 indexed bins, so can just make them all quality i
-        sampled_y.append(pd.Series(np.full(size, i))) #not scuffed at all trust
+        # they're all in the same 0 indexed bins, so can just make them all quality i
+        sampled_y.append(pd.Series(np.full(size, i)))  # not scuffed at all trust
 
-    #combining all the sampled data (not random order!) 
+    # combining all the sampled data (not random order!)
     wine_X = np.vstack(sampled_X)
     wine_y = pd.concat(sampled_y).reset_index(drop=True)
 
@@ -124,19 +127,42 @@ def get_binned_stratified_data(seed):
         wine_y_test,
     )
 
-def confusion(classifier, X_tr, y_tr, X_val, y_val):
+
+def confusion(classifier, X_tr, y_tr, X_val, y_val, save_file: str | None = None):
     classifier.fit(X_tr, y_tr)
 
     acc_tr = accuracy_score(y_tr, classifier.predict(X_tr))
     acc_te = accuracy_score(y_val, classifier.predict(X_val))
 
-    print(f'Results:')
-    print(f'--- Accuracy (train): {100*acc_tr:.2f}%')
-    print(f'--- Accuracy (test): {100*acc_te:.2f}%')
+    print(f"Results:")
+    print(f"--- Accuracy (train): {100 * acc_tr:.2f}%")
+    print(f"--- Accuracy (test): {100 * acc_te:.2f}%")
 
     cm = confusion_matrix(y_val, classifier.predict(X_val))
-    disp = ConfusionMatrixDisplay(confusion_matrix = cm)
-    disp.plot();
+    fig = px.imshow(
+        cm,
+        text_auto=True,
+        width=900,
+        height=750,
+    )
+    fig.update_layout(
+        xaxis_title="Predicted label",
+        yaxis_title="True label",
+        xaxis=dict(
+            tickmode="linear",
+            dtick=1,
+        ),
+        yaxis=dict(
+            tickmode="linear",
+            dtick=1,
+        ),
+        margin=dict(l=0, r=0, t=0, b=0),
+    )
+    fig.update_traces(textfont=dict(size=14))
+    if save_file:
+        pio.write_image(fig, save_file)
+    fig.show()
+
 
 def print_final_results(classifier, X_tr, y_tr, X_val, y_val, X_te, y_te):
     classifier.fit(X_tr, y_tr)
@@ -145,7 +171,9 @@ def print_final_results(classifier, X_tr, y_tr, X_val, y_val, X_te, y_te):
     sklearn_acc_val = accuracy_score(y_val, classifier.predict(X_val))
     sklearn_acc_te = accuracy_score(y_te, classifier.predict(X_te))
 
-    print(f'Results:')
-    print(f'--- Accuracy (train): {100*sklearn_acc_tr:.2f}%')
-    print(f'--- Accuracy (validation): {100*sklearn_acc_val:.2f}%')
-    print(f'--- Accuracy (test): {100*sklearn_acc_te:.2f}%') #this is the final accuracy
+    print(f"Results:")
+    print(f"--- Accuracy (train): {100 * sklearn_acc_tr:.2f}%")
+    print(f"--- Accuracy (validation): {100 * sklearn_acc_val:.2f}%")
+    print(
+        f"--- Accuracy (test): {100 * sklearn_acc_te:.2f}%"
+    )  # this is the final accuracy
