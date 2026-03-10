@@ -16,51 +16,20 @@ def load_data():
     wine_quality_data = pd.concat(
         [wine_quality_red, wine_quality_white], ignore_index=True
     )
-    return wine_quality_data
+    return wine_quality_data.drop_duplicates()
 
 
-def load_oversampled_data(seed):
+def load_oversampled_data(seed) -> pd.DataFrame:
     wine_quality_data = load_data()
     wine_X = wine_quality_data.drop(columns=["quality"])
     wine_y = wine_quality_data["quality"]
-    wine_X, wine_y = RandomOverSampler(random_state=seed).fit_resample(wine_X, wine_y)
+    wine_X, wine_y = RandomOverSampler(random_state=seed).fit_resample(wine_X, wine_y)  # type: ignore
     wine_X["quality"] = wine_y
-    return wine_X
+    return wine_X  # type: ignore
 
 
-def get_data(seed):
-    wine_quality_data = load_data()
-
-    wine_X = wine_quality_data.drop(columns=["quality"])  # drop quality
-    wine_X["color"] = (wine_X["color"] == "red").astype(
-        float
-    )  # make color a number instead of a string
-    scaler = StandardScaler()
-    wine_X = scaler.fit_transform(wine_X)  # scaling values
-
-    wine_y = wine_quality_data["quality"]
-    wine_y -= wine_y.min()
-
-    wine_X_train_val, wine_X_test, wine_y_train_val, wine_y_test = train_test_split(
-        wine_X, wine_y, test_size=0.2, random_state=seed
-    )
-
-    wine_X_tr, wine_X_val, wine_y_tr, wine_y_val = train_test_split(
-        wine_X_train_val, wine_y_train_val, test_size=0.25, random_state=seed
-    )
-
-    return (
-        wine_X_tr,
-        wine_X_val,
-        wine_X_test,
-        wine_y_tr,
-        wine_y_val,
-        wine_y_test,
-    )
-
-
-def get_binary_data(seed):
-    wine_quality_data = load_data()
+def get_data(seed, oversampled=False, binary=False):
+    wine_quality_data = load_oversampled_data(seed) if oversampled else load_data()
 
     wine_X = wine_quality_data.drop(columns=["quality"])  # drop quality
     wine_X["color"] = (wine_X["color"] == "red").astype(
@@ -69,7 +38,11 @@ def get_binary_data(seed):
     scaler = StandardScaler()
     wine_X = scaler.fit_transform(wine_X)  # scaling values
 
-    wine_y = wine_quality_data["quality"] >= 6
+    if binary:
+        wine_y = wine_quality_data["quality"] >= 6
+    else:
+        wine_y = wine_quality_data["quality"]
+        wine_y -= wine_y.min()
 
     wine_X_train_val, wine_X_test, wine_y_train_val, wine_y_test = train_test_split(
         wine_X, wine_y, test_size=0.2, random_state=seed
