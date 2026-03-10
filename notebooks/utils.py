@@ -2,6 +2,8 @@ from ucimlrepo import fetch_ucirepo
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
+import pandas as pd
+import numpy as np
 
 
 def get_data(seed):
@@ -48,6 +50,56 @@ def get_binary_data(seed):
     wine_X = scaler.fit_transform(wine_X)  # scaling values
 
     wine_y = wine_quality_data["quality"] >= 6
+
+    wine_X_train_val, wine_X_test, wine_y_train_val, wine_y_test = train_test_split(
+        wine_X, wine_y, test_size=0.2, random_state=seed
+    )
+
+    wine_X_tr, wine_X_val, wine_y_tr, wine_y_val = train_test_split(
+        wine_X_train_val, wine_y_train_val, test_size=0.25, random_state=seed
+    )
+
+    return (
+        wine_X_tr,
+        wine_X_val,
+        wine_X_test,
+        wine_y_tr,
+        wine_y_val,
+        wine_y_test,
+    )
+
+def get_binned_stratified_data(seed):
+    wine_quality = fetch_ucirepo(name="Wine Quality")
+    wine_quality_data = wine_quality["data"]["original"]
+
+    wine_X = wine_quality_data.drop(columns=["quality"])  # drop quality
+    wine_X["color"] = (wine_X["color"] == "red").astype(
+        float
+    )  # make color a number instead of a string
+    scaler = StandardScaler()
+    wine_X = scaler.fit_transform(wine_X)  # scaling values
+
+    wine_y = wine_quality_data["quality"]
+    wine_y -= wine_y.min()
+
+    #sorry this isn't general lol, binning the data
+    bins_y = [
+        wine_y[wine_y <= 1], #classes 3-4
+        wine_y[(wine_y >= 2) & (wine_y <=3)], #classes 5-6
+        wine_y[wine_y >= 4], #classes 7-9
+    ]
+    bins_X = [wine_X[b.index] for b in bins_y]
+
+    #sampling the data, this is general!
+    size = min(len(y) for y in bins_y)
+    sampled_X, sampled_y = [], []
+    for i, (bX, by) in enumerate(zip(bins_X, bins_y)):
+        idx = np.random.choice(len(by), size=size, replace=False)
+        sampled_X.append(bX[idx])
+        sampled_y.append(pd.Series(np.full(size, i))) #not scuffed at all trust
+
+    wine_X = np.vstack(sampled_X)
+    wine_y = pd.concat(sampled_y).reset_index(drop=True)
 
     wine_X_train_val, wine_X_test, wine_y_train_val, wine_y_test = train_test_split(
         wine_X, wine_y, test_size=0.2, random_state=seed
