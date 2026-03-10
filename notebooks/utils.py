@@ -1,16 +1,25 @@
-from ucimlrepo import fetch_ucirepo
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
+from sklearn.metrics import accuracy_score, confusion_matrix
 import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.io as pio
 
 
+def load_data():
+    wine_quality_red = pd.read_csv("winequality-red.csv", delimiter=";")
+    wine_quality_white = pd.read_csv("winequality-white.csv", delimiter=";")
+    wine_quality_red["color"] = "red"
+    wine_quality_white["color"] = "white"
+    wine_quality_data = pd.concat(
+        [wine_quality_red, wine_quality_white], ignore_index=True
+    )
+    return wine_quality_data
+
+
 def get_data(seed):
-    wine_quality = fetch_ucirepo(name="Wine Quality")
-    wine_quality_data = wine_quality["data"]["original"]
+    wine_quality_data = load_data()
 
     wine_X = wine_quality_data.drop(columns=["quality"])  # drop quality
     wine_X["color"] = (wine_X["color"] == "red").astype(
@@ -41,8 +50,7 @@ def get_data(seed):
 
 
 def get_binary_data(seed):
-    wine_quality = fetch_ucirepo(name="Wine Quality")
-    wine_quality_data = wine_quality["data"]["original"]
+    wine_quality_data = load_data()
 
     wine_X = wine_quality_data.drop(columns=["quality"])  # drop quality
     wine_X["color"] = (wine_X["color"] == "red").astype(
@@ -73,8 +81,7 @@ def get_binary_data(seed):
 
 def get_binned_stratified_data(seed):
     np.random.seed(seed=seed)
-    wine_quality = fetch_ucirepo(name="Wine Quality")
-    wine_quality_data = wine_quality["data"]["original"]
+    wine_quality_data = load_data()
 
     wine_X = wine_quality_data.drop(columns=["quality"])  # drop quality
     wine_X["color"] = (wine_X["color"] == "red").astype(
@@ -171,7 +178,7 @@ def print_final_results(classifier, X_tr, y_tr, X_val, y_val, X_te, y_te):
     sklearn_acc_val = accuracy_score(y_val, classifier.predict(X_val))
     sklearn_acc_te = accuracy_score(y_te, classifier.predict(X_te))
 
-    print(f"Results:")
+    print("Results:")
     print(f"--- Accuracy (train): {100 * sklearn_acc_tr:.2f}%")
     print(f"--- Accuracy (validation): {100 * sklearn_acc_val:.2f}%")
     print(
