@@ -69,6 +69,7 @@ def get_binary_data(seed):
     )
 
 def get_binned_stratified_data(seed):
+    np.random.seed(seed=seed)
     wine_quality = fetch_ucirepo(name="Wine Quality")
     wine_quality_data = wine_quality["data"]["original"]
 
