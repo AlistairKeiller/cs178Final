@@ -92,12 +92,17 @@ def get_binned_stratified_data(seed):
 
     #sampling the data, this is general!
     size = min(len(y) for y in bins_y)
-    sampled_X, sampled_y = [], []
+    sampled_X = []
+    sampled_y = []
     for i, (bX, by) in enumerate(zip(bins_X, bins_y)):
-        idx = np.random.choice(len(by), size=size, replace=False)
-        sampled_X.append(bX[idx])
+        #randomly sampling by size (minimum length) per bin
+        index = np.random.choice(len(by), size=size, replace=False)
+        #picking X value at these random indices
+        sampled_X.append(bX[index])
+        #they're all in the same 0 indexed bins, so can just make them all quality i
         sampled_y.append(pd.Series(np.full(size, i))) #not scuffed at all trust
 
+    #combining all the sampled data (not random order!) 
     wine_X = np.vstack(sampled_X)
     wine_y = pd.concat(sampled_y).reset_index(drop=True)
 
