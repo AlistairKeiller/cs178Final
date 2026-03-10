@@ -1,6 +1,7 @@
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix
+from imblearn.over_sampling import RandomOverSampler
 import pandas as pd
 import numpy as np
 import plotly.express as px
@@ -16,6 +17,15 @@ def load_data():
         [wine_quality_red, wine_quality_white], ignore_index=True
     )
     return wine_quality_data
+
+
+def load_oversampled_data(seed):
+    wine_quality_data = load_data()
+    wine_X = wine_quality_data.drop(columns=["quality"])
+    wine_y = wine_quality_data["quality"]
+    wine_X, wine_y = RandomOverSampler(random_state=seed).fit_resample(wine_X, wine_y)
+    wine_X["quality"] = wine_y
+    return wine_X
 
 
 def get_data(seed):
