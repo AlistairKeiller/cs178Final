@@ -30,7 +30,7 @@ def load_oversampled_data(seed) -> pd.DataFrame:
     return wine_X  # type: ignore
 
 
-def get_data(seed, oversampled=False, binary=False, drop_duplicates=True):
+def get_data(seed, oversampled=False, binary=False, drop_duplicates=False):
     wine_quality_data = load_oversampled_data(seed) if oversampled else load_data()
     if drop_duplicates:
         wine_quality_data.drop_duplicates(inplace=True)
