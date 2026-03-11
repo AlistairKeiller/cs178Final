@@ -10,6 +10,6 @@ dependencies = [
     "jupyter>=1.1.1",
     "kaleido>=1.2.0",
     "plotly>=6.6.0",
-    "scikit-learn>=1.7.2",
-    "torch>=2.9.0",
+    "scikit-learn==1.7.2",
+    "torch==2.9.0",
 ]

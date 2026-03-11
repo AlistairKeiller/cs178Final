@@ -189,6 +189,8 @@ def plot_curves(
         ]
     )
     fig = px.line(df, x=x_name, y=y_name, color=label_name, **kwargs)
+    fig.update_layout(margin=dict(l=0, r=0, t=0, b=0))
+    pio.write_image(fig, f"images/{label_name}.svg")
     fig.show()
 
 
