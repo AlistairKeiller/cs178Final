@@ -190,7 +190,13 @@ def plot_curves(
         ]
     )
     fig = px.line(df, x=x_name, y=y_name, color=label_name, width=1200, **kwargs)
-    fig.update_layout(margin=dict(l=0, r=0, t=0, b=0))
+    fig.update_layout(
+        margin=dict(l=0, r=0, t=0, b=0),
+        font=dict(size=18),
+        legend=dict(font=dict(size=16)),
+        xaxis=dict(title_font=dict(size=18), tickfont=dict(size=14)),
+        yaxis=dict(title_font=dict(size=18), tickfont=dict(size=14)),
+    )
     if image_name:
         pio.write_image(fig, f"images/{image_name}.svg")
     fig.show()
