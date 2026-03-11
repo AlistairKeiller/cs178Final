@@ -179,6 +179,7 @@ def plot_curves(
     x_name: str = "x axis",
     y_name: str = "y axis",
     label_name: str = "label",
+    image_name: str | None = None,
     **kwargs,
 ):
     df = pd.DataFrame(
@@ -188,9 +189,10 @@ def plot_curves(
             for x, y in data
         ]
     )
-    fig = px.line(df, x=x_name, y=y_name, color=label_name, **kwargs)
+    fig = px.line(df, x=x_name, y=y_name, color=label_name, width=1200, **kwargs)
     fig.update_layout(margin=dict(l=0, r=0, t=0, b=0))
-    pio.write_image(fig, f"images/{label_name}.svg")
+    if image_name:
+        pio.write_image(fig, f"images/{image_name}.svg")
     fig.show()
 
 
@@ -232,6 +234,7 @@ def train_and_plot_learning_curves(
         "train_size",
         "training accuracy",
         param_to_test,
+        f"train_{param_to_test}",
     )
     plot_curves(
         val_accuracies,
@@ -239,4 +242,5 @@ def train_and_plot_learning_curves(
         "train_size",
         "validation accuracy",
         param_to_test,
+        f"validation_{param_to_test}",
     )
