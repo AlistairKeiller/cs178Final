@@ -9,6 +9,7 @@ dependencies = [
     "imbalanced-learn>=0.14.1",
     "jupyter>=1.1.1",
     "kaleido>=1.2.0",
+    "optuna>=4.7.0",
     "plotly>=6.6.0",
     "scikit-learn==1.7.2",
     "torch==2.9.0",
