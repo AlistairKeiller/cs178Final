@@ -250,3 +250,26 @@ def train_and_plot_learning_curves(
         param_to_test,
         f"validation_{param_to_test}",
     )
+
+
+def clean(x):
+    return np.where(x == 0, 1, x)
+
+
+def final_test(model, wine_X_test, wine_y_test):
+    predictions = model.predict(wine_X_test)
+    confusion = confusion_matrix(wine_y_test, predictions)
+    acc = accuracy_score(wine_y_test, predictions)
+    precision = confusion.diagonal() / clean(confusion.sum(axis=0))
+    recall = confusion.diagonal() / clean(confusion.sum(axis=1))
+    F_measure = 2 * (precision * recall) / clean(precision + recall)
+    return pd.DataFrame(
+        [
+            {
+                "accuracy": acc,
+                "precision": precision.mean(),
+                "recall": recall.mean(),
+                "F-measure": F_measure.mean(),
+            }
+        ]
+    )
