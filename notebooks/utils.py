@@ -2,7 +2,13 @@ from typing import Any
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, confusion_matrix
+from sklearn.metrics import (
+    accuracy_score,
+    confusion_matrix,
+    f1_score,
+    precision_score,
+    recall_score,
+)
 from imblearn.over_sampling import RandomOverSampler
 import pandas as pd
 import numpy as np
@@ -252,24 +258,19 @@ def train_and_plot_learning_curves(
     )
 
 
-def clean(x):
-    return np.where(x == 0, 1, x)
-
-
 def final_test(model, wine_X_test, wine_y_test):
     predictions = model.predict(wine_X_test)
-    confusion = confusion_matrix(wine_y_test, predictions)
     acc = accuracy_score(wine_y_test, predictions)
-    precision = confusion.diagonal() / clean(confusion.sum(axis=0))
-    recall = confusion.diagonal() / clean(confusion.sum(axis=1))
-    F_measure = 2 * (precision * recall) / clean(precision + recall)
+    precision = precision_score(wine_y_test, predictions, average="weighted")
+    recall = recall_score(wine_y_test, predictions, average="weighted")
+    f1 = f1_score(wine_y_test, predictions, average="weighted")
     return pd.DataFrame(
         [
             {
                 "accuracy": acc,
-                "precision": precision.mean(),
-                "recall": recall.mean(),
-                "F-measure": F_measure.mean(),
+                "precision": precision,
+                "recall": recall,
+                "f1": f1,
             }
         ]
     )
