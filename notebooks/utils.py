@@ -1,3 +1,5 @@
+from typing import Any
+
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix
@@ -169,3 +171,70 @@ def print_final_results(classifier, X_tr, y_tr, X_val, y_val, X_te, y_te):
     print(
         f"--- Accuracy (test): {100 * sklearn_acc_te:.2f}%"
     )  # this is the final accuracy
+
+
+def plot_curves(
+    lines: list[list[tuple[Any, Any]]],
+    labels: list[str],
+    x_name: str = "x axis",
+    y_name: str = "y axis",
+    label_name: str = "label",
+    **kwargs,
+):
+    df = pd.DataFrame(
+        [
+            {x_name: x, y_name: y, label_name: label}
+            for data, label in zip(lines, labels)
+            for x, y in data
+        ]
+    )
+    fig = px.line(df, x=x_name, y=y_name, color=label_name, **kwargs)
+    fig.show()
+
+
+def train_and_plot_learning_curves(
+    models,
+    wine_X_tr,
+    wine_y_tr,
+    wine_X_val,
+    wine_y_val,
+    seed: int,
+    param_to_test: str,
+    train_sizes: np.ndarray = np.linspace(0.1, 1.0, 15),
+):
+    data_size = len(wine_X_tr)
+    train_accuracies = []
+    val_accuracies = []
+    for model in models:
+        train_acc_curve = []
+        val_acc_curve = []
+        np.random.seed(seed)
+        for train_size in train_sizes:
+            indices = np.random.choice(
+                data_size, int(train_size * data_size), replace=False
+            )
+            wine_X_tr_batch = wine_X_tr[indices]
+            wine_y_tr_batch = wine_y_tr.iloc[indices]
+            model.fit(wine_X_tr_batch, wine_y_tr_batch)
+            train_acc_curve.append(
+                (train_size, model.score(wine_X_tr_batch, wine_y_tr_batch))
+            )
+            val_acc_curve.append((train_size, model.score(wine_X_val, wine_y_val)))
+        train_accuracies.append(train_acc_curve)
+        val_accuracies.append(val_acc_curve)
+
+    param_value_str = [str(getattr(model, param_to_test)) for model in models]
+    plot_curves(
+        train_accuracies,
+        param_value_str,
+        "train_size",
+        "training accuracy",
+        param_to_test,
+    )
+    plot_curves(
+        val_accuracies,
+        param_value_str,
+        "train_size",
+        "validation accuracy",
+        param_to_test,
+    )
