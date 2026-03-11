@@ -16,7 +16,7 @@ def load_data():
     wine_quality_data = pd.concat(
         [wine_quality_red, wine_quality_white], ignore_index=True
     )
-    return wine_quality_data.drop_duplicates()
+    return wine_quality_data
 
 
 def load_oversampled_data(seed) -> pd.DataFrame:
@@ -28,8 +28,10 @@ def load_oversampled_data(seed) -> pd.DataFrame:
     return wine_X  # type: ignore
 
 
-def get_data(seed, oversampled=False, binary=False):
+def get_data(seed, oversampled=False, binary=False, drop_duplicates=True):
     wine_quality_data = load_oversampled_data(seed) if oversampled else load_data()
+    if drop_duplicates:
+        wine_quality_data.drop_duplicates(inplace=True)
 
     wine_X = wine_quality_data.drop(columns=["quality"])  # drop quality
     wine_X["color"] = (wine_X["color"] == "red").astype(
