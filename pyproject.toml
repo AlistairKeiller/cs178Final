@@ -5,12 +5,12 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "autogluon>=1.5.0",
     "autogluon-tabular[all]>=1.5.0",
+    "imbalanced-learn>=0.14.1",
     "jupyter>=1.1.1",
     "kaleido>=1.2.0",
+    "optuna>=4.7.0",
     "plotly>=6.6.0",
-    "scikit-learn>=1.6.1",
-    "torch>=2.6.0",
-    "ucimlrepo>=0.0.7",
+    "scikit-learn==1.7.2",
+    "torch==2.9.0",
 ]
