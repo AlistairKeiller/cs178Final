@@ -27,7 +27,7 @@ def load_data():
     return wine_quality_data
 
 
-def load_oversampled_data(seed) -> pd.DataFrame:
+def load_stratified_data(seed) -> pd.DataFrame:
     wine_quality_data = load_data()
     wine_X = wine_quality_data.drop(columns=["quality"])
     wine_y = wine_quality_data["quality"]
@@ -37,7 +37,7 @@ def load_oversampled_data(seed) -> pd.DataFrame:
 
 
 def get_data(seed, oversampled=False, binary=False, drop_duplicates=False):
-    wine_quality_data = load_oversampled_data(seed) if oversampled else load_data()
+    wine_quality_data = load_stratified_data(seed) if oversampled else load_data()
     if drop_duplicates:
         wine_quality_data.drop_duplicates(inplace=True)
 
