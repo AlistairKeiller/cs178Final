@@ -160,7 +160,34 @@ def confusion(classifier, X_tr, y_tr, X_val, y_val, save_file: str | None = None
     )
     fig.update_traces(textfont=dict(size=14))
     if save_file:
-        pio.write_image(fig, save_file)
+        pio.write_image(fig, f"images/{save_file}")
+    fig.show()
+
+
+def confusion_mat(y_true, y_pred, save_file: str | None = None):
+    cm = confusion_matrix(y_true, y_pred)
+    fig = px.imshow(
+        cm,
+        text_auto=True,
+        width=900,
+        height=750,
+    )
+    fig.update_layout(
+        xaxis_title="Predicted label",
+        yaxis_title="True label",
+        xaxis=dict(
+            tickmode="linear",
+            dtick=1,
+        ),
+        yaxis=dict(
+            tickmode="linear",
+            dtick=1,
+        ),
+        margin=dict(l=0, r=0, t=0, b=0),
+    )
+    fig.update_traces(textfont=dict(size=14))
+    if save_file:
+        pio.write_image(fig, f"images/{save_file}")
     fig.show()
 
 
