@@ -37,8 +37,8 @@ def load_stratified_data(seed) -> pd.DataFrame:
     return wine_X  # type: ignore
 
 
-def get_data(seed, oversampled=False, binary=False):
-    wine_quality_data = load_stratified_data(seed) if oversampled else load_data()
+def get_data(seed, stratified=False, binary=False):
+    wine_quality_data = load_stratified_data(seed) if stratified else load_data()
 
     wine_X = wine_quality_data.drop(columns=["quality"])  # drop quality
     wine_X["color"] = (wine_X["color"] == "red").astype(
