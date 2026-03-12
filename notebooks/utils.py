@@ -49,14 +49,15 @@ def get_data(seed, stratified=False, binary=False, deduped=False):
     wine_X_train_val, wine_X_test, wine_y_train_val, wine_y_test = train_test_split(
         wine_X, wine_y, test_size=0.2, random_state=seed
     )
-    if stratified:
-        wine_X_train_val, wine_y_train_val = RandomOverSampler(
-            random_state=seed
-        ).fit_resample(wine_X_train_val, wine_y_train_val)
 
     wine_X_tr, wine_X_val, wine_y_tr, wine_y_val = train_test_split(
         wine_X_train_val, wine_y_train_val, test_size=0.25, random_state=seed
     )
+
+    if stratified:
+        wine_X_tr, wine_y_tr = RandomOverSampler(random_state=seed).fit_resample(
+            wine_X_tr, wine_y_tr
+        )
 
     return (
         wine_X_tr,
