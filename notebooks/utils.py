@@ -52,7 +52,6 @@ def get_data(seed, oversampled=False, binary=False, drop_duplicates=False):
         wine_y = wine_quality_data["quality"] >= 6
     else:
         wine_y = wine_quality_data["quality"]
-        wine_y -= wine_y.min()
 
     wine_X_train_val, wine_X_test, wine_y_train_val, wine_y_test = train_test_split(
         wine_X, wine_y, test_size=0.2, random_state=seed
@@ -166,11 +165,14 @@ def confusion(classifier, X_tr, y_tr, X_val, y_val, save_file: str | None = None
 
 def confusion_mat(y_true, y_pred, save_file: str | None = None):
     cm = confusion_matrix(y_true, y_pred)
+    labels = np.unique(np.concatenate([y_true, y_pred]))
     fig = px.imshow(
         cm,
         text_auto=True,
         width=900,
         height=750,
+        x=labels,
+        y=labels,
     )
     fig.update_layout(
         xaxis_title="Predicted label",
